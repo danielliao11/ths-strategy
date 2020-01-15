@@ -1,4 +1,4 @@
-#变量初始化区域
+# 变量初始化区域
 highList = []
 lowList = []
 closeList = []
@@ -14,12 +14,12 @@ shortCycle = 12
 longCycle = 26
 deaCycle = 9
 
-#取数据区域
+# 取数据区域
 for i in range(0, total):
     h = get("最高价", i)
-    o = get("收盘价", i)
-    c = get("最低价", i)
-    l = get("开盘价", i)
+    o = get("开盘价", i)
+    c = get("收盘价", i)
+    l = get("最低价", i)
     hevo.save("K", h, o, l, c, i)
 
     highList.append(h)
@@ -28,7 +28,7 @@ for i in range(0, total):
     openList.append(o)
 
 
-#计算数据区域
+# 计算数据区域
 for i in range(0, total):
     # 计算 macd
     shortAvg = EMA(closeList, shortCycle, i) # 短周期移动平均
@@ -41,16 +41,16 @@ for i in range(0, total):
     # 通过macd判断市场方向
     # 金叉上行
     if ((diff - dea) > 0) and (diffList[i - 1] <= deaList[i -1]):
-        ks = 0.6
-        kx = 0.9
+        ks = 0.5
+        kx = 0.7
     # 死叉下行
     elif ((diff - dea) < 0) and (diffList[i - 1] >= deaList[i -1 ]):
-        ks = 0.9
-        kx = 0.6
+        ks = 0.7
+        kx = 0.5
     # 否则震荡
     else:
-        ks = 0.6
-        kx = 0.6
+        ks = 0.5
+        kx = 0.5
     
     # 构建dual trust 通道
     hh = HHV(highList, tdCycle, i) # 前n日最高价
@@ -58,8 +58,9 @@ for i in range(0, total):
     hc = HHV(closeList, tdCycle, i) # 前n日最高收盘价
     ll = LLV(lowList, tdCycle, i) # 前n日最低价
     range = max(hh - lc, hc - ll) # 确定通道范围
-    buyLine = o + ks * range
-    sellLine = o - kx * range
+    currentOpen = openList[i]
+    buyLine = currentOpen + ks * range
+    sellLine = currentOpen - kx * range
     
     save("B", buyLine, i)
     save("S", sellLine, i)
