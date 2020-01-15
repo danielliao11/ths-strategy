@@ -9,7 +9,7 @@ hcList = []
 llList = []
 diffList = []
 deaList = []
-tdCycle = 5
+tdCycle = 3
 shortCycle = 12
 longCycle = 26
 deaCycle = 9
@@ -41,16 +41,16 @@ for i in range(0, total):
     # 通过macd判断市场方向
     # 金叉上行
     if ((diff - dea) > 0) and (diffList[i - 1] <= deaList[i -1]):
-        ks = 0.5
-        kx = 0.7
+        ks = 0.6
+        kx = 0.9
     # 死叉下行
     elif ((diff - dea) < 0) and (diffList[i - 1] >= deaList[i -1 ]):
-        ks = 0.7
-        kx = 0.5
+        ks = 0.9
+        kx = 0.6
     # 否则震荡
     else:
-        ks = 0.7
-        kx = 0.7
+        ks = 0.6
+        kx = 0.6
     
     # 构建dual trust 通道
     hh = HHV(highList, tdCycle, i) # 前n日最高价
@@ -66,5 +66,5 @@ for i in range(0, total):
 
 #画线区域
 draw.kline("K")
-draw.curve("B", 00)
-draw.curve("S", 03)
+draw.curve("B", 0)
+draw.curve("S", 3)
