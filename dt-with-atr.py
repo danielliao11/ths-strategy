@@ -10,11 +10,11 @@ llList = []
 diffList = []
 deaList = []
 trList = []
-tdPeriod = 3
+dtPeriod = 3
 shortPeriod = 12
 longPeriod = 26
 deaPeriod = 9
-trPeriod = 15
+trPeriod = 14
 
 # 取数据区域
 for i in range(0, total):
@@ -44,36 +44,39 @@ for i in range(0, total):
     # 金叉上行
     if ((diff - dea) > 0) and (diffList[i - 1] <= deaList[i -1]):
         ks = 0.3
+        kx = 0.5
     # 死叉下行
     elif ((diff - dea) < 0) and (diffList[i - 1] >= deaList[i - 1]):
         ks = 0.5
+        kx = 0.3
     # 否则震荡
     else:
-        ks = 0.5
+        ks = 0.7
+        kx = 0.7
     
     # 构建dual trust 通道
-    hh = HHV(highList, tdPeriod, i - 1) # 前n日最高价
-    lc = LLV(closeList, tdPeriod, i - 1) # 前n日最低收盘价
-    hc = HHV(closeList, tdPeriod, i - 1) # 前n日最高收盘价
-    ll = LLV(lowList, tdPeriod, i - 1) # 前n日最低价
+    hh = HHV(highList, dtPeriod, i - 1) # 前n日最高价
+    lc = LLV(closeList, dtPeriod, i - 1) # 前n日最低收盘价
+    hc = HHV(closeList, dtPeriod, i - 1) # 前n日最高收盘价
+    ll = LLV(lowList, dtPeriod, i - 1) # 前n日最低价
     range = max(hh - lc, hc - ll) # 确定通道范围
     # 构建 TR
-    h = highList[i - 1]
-    l = lowList[i - 1]
+    h = highList[i] # 当日最高
+    l = lowList[i] # 当日最低
     lastClose = closeList[i - 1]
-    tr = max(max(h - l, abs(lastClose - h)), abs(lastClose - l))
+    tr = max(h - l, abs(lastClose - h), abs(lastClose - l))
     trList.append(tr)
-    atrL = MA(trList, longPeriod, i - 1)
-    atrS = MA(trList, trPeriod, i - 1)
+    atr = MA(trList, trPeriod, i)
     hightest = HHV(highList, trPeriod, i - 1)
     currentOpen = openList[i]
-    buyLine = currentOpen + ks * range
-    sellLine = max(abs(hightest - 3*atrS), abs(hightest - 3*atrL), abs(lastClose - 1.5*atrS), abs(lastClose - 1.5*atrL))
+    upTrack = currentOpen + ks * range
+    downTrack = currentOpen - kx * range
+    closeTrack = max(abs(hightest - 3*atr), abs(lastClose - 1.5*atr), downTrack)
     
-    save("B", buyLine, i)
-    save("S", sellLine, i)
+    save("open", upTrack, i)
+    save("close", closeTrack, i)
 
 #画线区域
 draw.kline("K")
-draw.curve("B", 0)
-draw.curve("S", 7)
+draw.curve("open", 0)
+draw.curve("close", 3)
